@@ -1,11 +1,12 @@
 services:
   - type: web
     name: chatbot-uesvalle
-    runtime: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn webchat.main:app --host 0.0.0.0 --port 10000
+    env: python
+    region: america
+    plan: free
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: uvicorn webchat.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: 3.10
-    plan: free
-    region: America
+

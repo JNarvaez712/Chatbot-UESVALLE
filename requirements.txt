@@ -15,7 +15,10 @@ python-multipart==0.0.9
 # Embeddings y LLM indexación
 llama-index==0.10.36
 sentence-transformers==2.6.1
+langchain==0.1.16
+huggingface-hub==0.21.4
 
 # Utilidades varias
 tqdm==4.66.4
+
 
