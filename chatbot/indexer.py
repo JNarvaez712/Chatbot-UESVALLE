@@ -1,7 +1,7 @@
 # chatbot/indexer.py
 
 import os
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, StorageContext, load_index_from_storage
+from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, StorageContext, load_indices_from_storage
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from chatbot.config import EMBEDDING_MODEL, DOCS_DIR, STORAGE_DIR
 from chatbot.web_loader import cargar_documentos_web
@@ -42,7 +42,9 @@ def crear_o_cargar_indice():
         print("📚 Cargando índice existente...")
         storage_context = StorageContext.from_defaults(persist_dir=STORAGE_DIR)
         embed_model = HuggingFaceEmbedding(model_name=EMBEDDING_MODEL)
-        index = load_index_from_storage(storage_context, embed_model=embed_model)
+        index_list = load_indices_from_storage(storage_context, embed_model=embed_model)
+        index = index_list[0]  # usa el primer índice (asumiendo que solo tienes uno)
+
         return index
 
 if __name__ == "__main__":

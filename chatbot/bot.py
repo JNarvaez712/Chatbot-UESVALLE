@@ -1,6 +1,6 @@
 # chatbot/bot.py
 
-from llama_index.core import load_index_from_storage, StorageContext
+from llama_index.core import load_indices_from_storage, StorageContext
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from chatbot.config import EMBEDDING_MODEL, STORAGE_DIR
 
@@ -10,7 +10,9 @@ def cargar_motor_preguntas():
 
     # Carga el índice desde disco con los embeddings correctos
     storage_context = StorageContext.from_defaults(persist_dir=STORAGE_DIR)
-    index = load_index_from_storage(storage_context, embed_model=embed_model)
+    index_list = load_indices_from_storage(storage_context, embed_model=embed_model)
+    index = index_list[0]  # usa el primer índice (asumiendo que solo tienes uno)
+
 
     # Crea el motor de consulta
     query_engine = index.as_query_engine()
