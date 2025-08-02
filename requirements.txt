@@ -1,0 +1,20 @@
+# Backend API
+fastapi==0.110.2
+uvicorn[standard]==0.30.1
+
+# Templates HTML
+jinja2==3.1.3
+
+# Web scraping
+beautifulsoup4==4.12.3
+requests==2.31.0
+
+# Manejo de formularios/multipart
+python-multipart==0.0.9
+
+# Embeddings y LLM indexación
+llama-index==0.10.36
+sentence-transformers==2.6.1
+
+# Utilidades varias
+tqdm==4.66.4
