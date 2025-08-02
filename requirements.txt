@@ -14,10 +14,12 @@ python-multipart==0.0.9
 
 # Embeddings y LLM indexación
 llama-index==0.10.36
-sentence-transformers==2.2.2  # compatible y sin necesidad de compilación
+sentence-transformers==2.2.2
+langchain==0.1.14
 
 # Utilidades varias
 tqdm==4.66.4
+
 
 
 

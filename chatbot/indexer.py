@@ -1,6 +1,9 @@
+# chatbot/indexer.py
+
 import os
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, StorageContext, load_indices_from_storage
-from llama_index.embeddings.huggingface import HuggingFaceEmbedding  # ✅ CORREGIDO
+from llama_index.embeddings.langchain import LangchainEmbedding
+from langchain.embeddings import HuggingFaceEmbeddings
 from chatbot.config import EMBEDDING_MODEL, DOCS_DIR, STORAGE_DIR
 from chatbot.web_loader import cargar_documentos_web
 from chatbot.document_loader import cargar_documentos_web as cargar_documentos_desde_web
@@ -26,7 +29,7 @@ def crear_o_cargar_indice():
         todos_los_docs = documentos_locales + documentos_web_texto + documentos_web_archivos
 
         # Crear modelo de embeddings
-        embed_model = HuggingFaceEmbedding(model_name=EMBEDDING_MODEL)  # ✅ ACTUALIZADO
+        embed_model = LangchainEmbedding(HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL))
 
         # Crear e indexar
         print("🧠 Generando índice...")
@@ -39,14 +42,16 @@ def crear_o_cargar_indice():
     else:
         print("📚 Cargando índice existente...")
         storage_context = StorageContext.from_defaults(persist_dir=STORAGE_DIR)
-        embed_model = HuggingFaceEmbedding(model_name=EMBEDDING_MODEL)  # ✅ ACTUALIZADO
+        embed_model = LangchainEmbedding(HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL))
         index_list = load_indices_from_storage(storage_context, embed_model=embed_model)
         index = index_list[0]  # usa el primer índice (asumiendo que solo tienes uno)
+
         return index
 
 if __name__ == "__main__":
     print("🚀 Creando o cargando índice...")
     index = crear_o_cargar_indice()
     print("🎉 ¡Índice listo!")
+
 
 
