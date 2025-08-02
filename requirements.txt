@@ -13,8 +13,9 @@ requests==2.31.0
 python-multipart==0.0.9
 
 # Embeddings y LLM indexación
-llama-index==0.10.36
+llama-index==0.9.48
 sentence-transformers==2.6.1
 
 # Utilidades varias
 tqdm==4.66.4
+
