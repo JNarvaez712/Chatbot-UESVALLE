@@ -1,13 +1,10 @@
-# chatbot/bot.py
-
 from llama_index.core import load_indices_from_storage, StorageContext
-from llama_index.embeddings.langchain import LangchainEmbedding
-from langchain.embeddings import HuggingFaceEmbeddings
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding  # ✅ CORREGIDO
 from chatbot.config import EMBEDDING_MODEL, STORAGE_DIR
 
 def cargar_motor_preguntas():
     # Usa el mismo modelo de embeddings con el que fue creado el índice
-    embed_model = LangchainEmbedding(HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL))
+    embed_model = HuggingFaceEmbedding(model_name=EMBEDDING_MODEL)  # ✅ ACTUALIZADO
 
     # Carga el índice desde disco con los embeddings correctos
     storage_context = StorageContext.from_defaults(persist_dir=STORAGE_DIR)
