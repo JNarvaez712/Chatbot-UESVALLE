@@ -1,33 +1,46 @@
+# chatbot/bot.py
+from functools import lru_cache
 from llama_index.core import load_indices_from_storage, StorageContext
-from llama_index.embeddings.huggingface import HuggingFaceEmbedding  # ✅ CORREGIDO
-from chatbot.config import EMBEDDING_MODEL, STORAGE_DIR
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from llama_index.core.settings import Settings
+from llama_index.core.query_engine import RetrieverQueryEngine
+from llama_index.core.response_synthesizers import get_response_synthesizer
+from llama_index.core.retrievers import VectorIndexRetriever
+from chatbot.config import EMBEDDING_MODEL, STORAGE_DIR, TOP_K
 
-def cargar_motor_preguntas():
-    # Usa el mismo modelo de embeddings con el que fue creado el índice
-    embed_model = HuggingFaceEmbedding(model_name=EMBEDDING_MODEL)  # ✅ ACTUALIZADO
 
-    # Carga el índice desde disco con los embeddings correctos
+@lru_cache(maxsize=1)
+def _get_index():
+    """Carga el índice desde disco una sola vez (cacheado)."""
+    embed_model = HuggingFaceEmbedding(model_name=EMBEDDING_MODEL)
+    Settings.embed_model = embed_model
     storage_context = StorageContext.from_defaults(persist_dir=STORAGE_DIR)
     index_list = load_indices_from_storage(storage_context, embed_model=embed_model)
-    index = index_list[0]  # usa el primer índice (asumiendo que solo tienes uno)
+    return index_list[0]
 
-    # Crea el motor de consulta
-    query_engine = index.as_query_engine()
-    return query_engine
+
+@lru_cache(maxsize=1)
+def cargar_motor_preguntas():
+    """Prepara un motor de recuperación+síntesis eficiente y compacto."""
+    index = _get_index()
+    retriever = VectorIndexRetriever(index=index, similarity_top_k=TOP_K)
+    synthesizer = get_response_synthesizer(response_mode="compact")
+    return RetrieverQueryEngine(retriever=retriever, response_synthesizer=synthesizer)
+
 
 def responder_pregunta(pregunta: str) -> str:
-    # Ejecuta la pregunta usando el motor cargado
     engine = cargar_motor_preguntas()
-    respuesta = engine.query(pregunta)
-    return str(respuesta)
+    resp = engine.query(pregunta)
+    return str(resp)
 
-# Si el archivo se ejecuta directamente, entra en modo interactivo por consola
+
 if __name__ == "__main__":
+    # Modo consola para pruebas locales
+    print("Chatbot UESVALLE (escribe 'salir' para terminar)")
     while True:
-        pregunta = input("¿Qué deseas preguntar? ")
-        if pregunta.lower() in ["salir", "exit", "quit"]:
+        pregunta = input("> ")
+        if pregunta.strip().lower() in {"salir", "exit", "quit"}:
             break
-        respuesta = responder_pregunta(pregunta)
-        print(f"\n🧠 Respuesta:\n{respuesta}\n")
+        print(responder_pregunta(pregunta), "\n")
 
 

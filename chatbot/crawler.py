@@ -1,69 +1,64 @@
 # chatbot/crawler.py
+import time
+from urllib.parse import urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin, urlparse
-import time
 
-# URL inicial del sitio de UESVALLE
-BASE_URL = "https://www.uesvalle.gov.co"
+from chatbot.config import (
+    BASE_URL,
+    USER_AGENT,
+    MAX_PAGINAS_RASTREO,
+    HTTP_TIMEOUT,
+)
 
-# Cabeceras para simular un navegador
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (compatible; UESVALLEBot/1.0; +https://www.uesvalle.gov.co/)"
-}
+HEADERS = {"User-Agent": USER_AGENT}
 
-def es_enlace_interno(link, dominio_base):
+
+def _es_enlace_interno(link: str, dominio_base: str) -> bool:
     parsed_link = urlparse(link)
     return parsed_link.netloc in ("", dominio_base)
 
-def limpiar_texto(html):
-    soup = BeautifulSoup(html, "html.parser")
 
-    # Eliminar scripts y estilos
+def _limpiar_texto_html(html: str) -> str:
+    soup = BeautifulSoup(html, "html.parser")
     for tag in soup(["script", "style", "noscript"]):
         tag.decompose()
-
-    # Obtener texto limpio
     return soup.get_text(separator="\n", strip=True)
 
-def rastrear_sitio(url_inicial=BASE_URL, max_paginas=30):
+
+def rastrear_sitio(url_inicial: str = BASE_URL, max_paginas: int = MAX_PAGINAS_RASTREO):
     visitadas = set()
     por_visitar = [url_inicial]
     resultados = []
     dominio_base = urlparse(url_inicial).netloc
 
-    print("🌐 Iniciando rastreo desde:", url_inicial)
+    print("🌐 Iniciando rastreo:", url_inicial)
 
     while por_visitar and len(visitadas) < max_paginas:
         url = por_visitar.pop(0)
-
         if url in visitadas:
             continue
 
         try:
-            resp = requests.get(url, headers=HEADERS, timeout=10)
+            resp = requests.get(url, headers=HEADERS, timeout=HTTP_TIMEOUT)
             resp.raise_for_status()
             html = resp.text
-            texto = limpiar_texto(html)
-            resultados.append({
-                "url": url,
-                "text": texto
-            })
-            print(f"✅ {url} (OK)")
+            texto = _limpiar_texto_html(html)
+            resultados.append({"url": url, "text": texto})
+            print(f"✅ {url}")
 
-            # Buscar más enlaces en la página
             soup = BeautifulSoup(html, "html.parser")
             for a in soup.find_all("a", href=True):
-                link = urljoin(url, a["href"].split("#")[0])  # Eliminar anchors
-                if es_enlace_interno(link, dominio_base) and link not in visitadas:
+                link = urljoin(url, a["href"].split("#")[0])
+                if _es_enlace_interno(link, dominio_base) and link not in visitadas:
                     por_visitar.append(link)
 
         except Exception as e:
-            print(f"⚠️ Error al acceder a {url}: {e}")
+            print(f"⚠️ Error en {url}: {e}")
 
         visitadas.add(url)
-        time.sleep(0.5)  # Respetar el servidor
+        time.sleep(0.5)  # respeta el servidor
 
-    print(f"🧭 Rastreo completo. Se extrajo contenido de {len(resultados)} páginas.")
+    print(f"🧭 Rastreo completo. Páginas extraídas: {len(resultados)}")
     return resultados
