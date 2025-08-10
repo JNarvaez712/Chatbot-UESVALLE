@@ -1,28 +1,29 @@
-# ---- Web API
+# Web API
 fastapi==0.110.2
 uvicorn[standard]==0.30.1
 aiofiles==23.2.1
 
-# ---- Templates
+# Templates
 jinja2==3.1.3
 
-# ---- Scraping
+# Scraping
 beautifulsoup4==4.12.3
 requests==2.31.0
 
-# ---- Multipart
+# Multipart
 python-multipart==0.0.9
 
-# ---- LlamaIndex (core + embeddings HuggingFace)
+# LlamaIndex (core + plugin de embeddings de Hugging Face)
 llama-index==0.10.36
-llama-index-embeddings-huggingface==0.2.6
+llama-index-embeddings-huggingface==0.5.5
 
-# ---- NLP stack
+# NLP
 sentence-transformers==2.2.2
-nltk==3.8.1          # fijamos versión estable (evita 'punkt_tab' raro)
+nltk==3.8.1
 
-# ---- Utils
+# Utils
 tqdm==4.66.4
+
 
 
 
