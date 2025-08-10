@@ -1,24 +1,29 @@
-# Backend API
+# ---- Web API
 fastapi==0.110.2
 uvicorn[standard]==0.30.1
-aiofiles==23.2.1        # recomendado para servir estáticos
+aiofiles==23.2.1
 
-# Templates HTML
+# ---- Templates
 jinja2==3.1.3
 
-# Web scraping
+# ---- Scraping
 beautifulsoup4==4.12.3
 requests==2.31.0
 
-# Formularios/multipart
+# ---- Multipart
 python-multipart==0.0.9
 
-# Embeddings e indexación
+# ---- LlamaIndex (core + embeddings HuggingFace)
 llama-index==0.10.36
-sentence-transformers==2.2.2
+llama-index-embeddings-huggingface==0.2.6
 
-# Utilidades
+# ---- NLP stack
+sentence-transformers==2.2.2
+nltk==3.8.1          # fijamos versión estable (evita 'punkt_tab' raro)
+
+# ---- Utils
 tqdm==4.66.4
+
 
 
 
