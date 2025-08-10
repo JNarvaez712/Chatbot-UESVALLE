@@ -1,27 +1,27 @@
 # chatbot/config.py
 
-# Modelo de embeddings (open‑source, rápido y liviano)
+# ===== NLP / Indexación =====
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+TOP_K = 5
+CHUNK_SIZE = 900
+CHUNK_OVERLAP = 120
 
-# Directorios de datos
+# ===== Rutas de datos =====
 DOCS_DIR = "data/documentos"
 STORAGE_DIR = "data/storage"
-
-# Crawler
-BASE_URL = "https://www.uesvalle.gov.co"
-USER_AGENT = "Mozilla/5.0 (compatible; UESVALLEBot/1.0; +https://www.uesvalle.gov.co/)"
-
-# Descarga temporal de archivos de la web (PDF/DOCX/XLSX…)
 TMP_DOC_DIR = "data/tmp_docs"
-
-# Snapshot del contenido HTML para detectar cambios
 SNAPSHOT_DIR = "data/web_snapshot"
+URL_MANIFEST_PATH = "data/url_manifest.json"
 
-# Límites y tiempos
-MAX_PAGINAS_RASTREO = 30       # páginas HTML a rastrear por pasada
-MAX_DOCUMENTOS_BUSQUEDA = 50   # documentos enlazados a descubrir
-HTTP_TIMEOUT = 10              # segundos
+# ===== Sitio objetivo =====
+BASE_URL = "https://www.uesvalle.gov.co"
+ALLOWED_DOMAINS = ["uesvalle.gov.co", "www.uesvalle.gov.co"]
 
-# Recuperación semántica
-TOP_K = 4                      # documentos similares a recuperar por pregunta
-
+# ===== Crawler / Red =====
+USER_AGENT = "Mozilla/5.0 (compatible; UESVALLEBot/1.2; +https://www.uesvalle.gov.co/)"
+HTTP_TIMEOUT = 12
+RESPECT_ROBOTS = True
+CRAWL_MAX_DEPTH = 6
+MAX_PAGINAS_RASTREO = 5000     # límite superior (HTML)
+MAX_DOCUMENTOS_BUSQUEDA = 800  # documentos enlazados
+MAX_DOC_BYTES = 25 * 1024 * 1024  # 25MB

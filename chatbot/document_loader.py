@@ -8,86 +8,92 @@ from bs4 import BeautifulSoup
 from llama_index.core import SimpleDirectoryReader
 
 from chatbot.config import (
-    BASE_URL,
-    USER_AGENT,
-    TMP_DOC_DIR,
-    MAX_DOCUMENTOS_BUSQUEDA,
-    HTTP_TIMEOUT,
+    BASE_URL, USER_AGENT, TMP_DOC_DIR, MAX_DOCUMENTOS_BUSQUEDA,
+    HTTP_TIMEOUT, MAX_DOC_BYTES, ALLOWED_DOMAINS
 )
 
 HEADERS = {"User-Agent": USER_AGENT}
-VALID_EXTS = (".pdf", ".docx", ".xlsx", ".xls")
+VALID_CT = (
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument",
+    "application/msword",
+    "application/vnd.ms-excel",
+)
 
+def _is_internal(url: str) -> bool:
+    host = urlparse(url).netloc.lower()
+    return host == "" or any(host.endswith(d) for d in ALLOWED_DOMAINS)
 
-def _es_documento(url: str) -> bool:
-    return url.lower().endswith(VALID_EXTS)
+def _looks_doc_by_ext(url: str) -> bool:
+    u = url.lower()
+    return u.endswith((".pdf", ".docx", ".xlsx", ".xls", ".doc"))
 
-
-def _es_enlace_interno(url: str) -> bool:
-    netloc = urlparse(url).netloc
-    return netloc == "" or "uesvalle.gov.co" in netloc
-
-
-def _descargar_documento(url: str, destino: str):
+def _head_ok(url: str) -> bool:
     try:
-        r = requests.get(url, headers=HEADERS, timeout=HTTP_TIMEOUT)
-        r.raise_for_status()
-        with open(destino, "wb") as f:
-            f.write(r.content)
-        print(f"📄 Descargado: {url}")
-    except Exception as e:
-        print(f"⚠️ Error al descargar {url}: {e}")
+        r = requests.head(url, headers=HEADERS, timeout=HTTP_TIMEOUT, allow_redirects=True)
+        if int(r.headers.get("Content-Length", "0")) > MAX_DOC_BYTES:
+            return False
+        ctype = r.headers.get("Content-Type", "").lower()
+        return any(ct in ctype for ct in VALID_CT)
+    except Exception:
+        return False
 
+def _download(url: str, destino: str):
+    r = requests.get(url, headers=HEADERS, timeout=HTTP_TIMEOUT, allow_redirects=True)
+    r.raise_for_status()
+    if int(r.headers.get("Content-Length", "0")) > MAX_DOC_BYTES:
+        raise RuntimeError("archivo demasiado grande")
+    with open(destino, "wb") as f:
+        f.write(r.content)
+    print(f"📄 Descargado: {url}")
 
-def encontrar_documentos_en_web(max_docs: int = MAX_DOCUMENTOS_BUSQUEDA):
-    print("🔍 Buscando documentos en el sitio web de UESVALLE...")
-    visitadas = set()
-    por_visitar = [BASE_URL]
-    encontrados = []
+def _discover_docs(max_docs: int = MAX_DOCUMENTOS_BUSQUEDA):
+    print("🔍 Descubriendo documentos enlazados…")
+    encontrados, visitadas, por_visitar = set(), set(), [BASE_URL]
 
-    while por_visitar and len(visitadas) < max_docs:
+    while por_visitar and len(encontrados) < max_docs:
         url = por_visitar.pop(0)
         if url in visitadas:
             continue
-
+        visitadas.add(url)
         try:
             r = requests.get(url, headers=HEADERS, timeout=HTTP_TIMEOUT)
             r.raise_for_status()
             soup = BeautifulSoup(r.text, "html.parser")
-
             for a in soup.find_all("a", href=True):
                 link = urljoin(url, a["href"].split("#")[0])
-                if _es_enlace_interno(link):
-                    if _es_documento(link):
-                        if link not in encontrados:
-                            encontrados.append(link)
-                    elif link not in visitadas:
+                if not _is_internal(link):
+                    continue
+                if _looks_doc_by_ext(link) and _head_ok(link):
+                    encontrados.add(link)
+                else:
+                    if link not in visitadas:
                         por_visitar.append(link)
         except Exception as e:
             print(f"⚠️ Error en {url}: {e}")
 
-        visitadas.add(url)
-
-    print(f"✅ Documentos encontrados: {len(encontrados)}")
-    return encontrados
-
+    print(f"✅ Documentos candidatos: {len(encontrados)}")
+    return sorted(encontrados)
 
 def cargar_documentos_web():
     Path(TMP_DOC_DIR).mkdir(parents=True, exist_ok=True)
-    urls = encontrar_documentos_en_web()
-    rutas_locales = []
+    urls = _discover_docs()
+    rutas = []
 
     for url in urls:
-        nombre_archivo = url.split("/")[-1].split("?")[0]
-        ruta_local = os.path.join(TMP_DOC_DIR, nombre_archivo)
-        if not os.path.exists(ruta_local):
-            _descargar_documento(url, ruta_local)
-        rutas_locales.append(ruta_local)
+        nombre = url.split("/")[-1].split("?")[0]
+        ruta = os.path.join(TMP_DOC_DIR, nombre)
+        if not os.path.exists(ruta):
+            try:
+                _download(url, ruta)
+            except Exception as e:
+                print(f"⚠️ No se pudo descargar {url}: {e}")
+                continue
+        rutas.append(ruta)
 
-    if rutas_locales:
-        print("📚 Procesando documentos descargados...")
-        reader = SimpleDirectoryReader(TMP_DOC_DIR)
-        return reader.load_data()
+    if rutas:
+        print("📚 Procesando documentos descargados…")
+        return SimpleDirectoryReader(TMP_DOC_DIR).load_data()
 
-    print("ℹ️ No hay documentos nuevos para procesar.")
+    print("ℹ️ No hay documentos para procesar.")
     return []
