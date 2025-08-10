@@ -13,16 +13,21 @@ requests==2.31.0
 # Multipart
 python-multipart==0.0.9
 
-# LlamaIndex (core + plugin de embeddings de Hugging Face)
+# LlamaIndex (core + plugin de embeddings de HuggingFace)
 llama-index==0.10.36
 llama-index-embeddings-huggingface==0.2.3
 
 # NLP
-sentence-transformers==2.2.2
+sentence-transformers==2.6.1     # ← subido para cumplir con el plugin
 nltk==3.8.1
+
+# (opcional pero recomendado para evitar builds desde fuente)
+torch==2.1.2                      # ruedas CPU manylinux para Py3.11
+# torchvision es opcional; si no usas visión, no lo instales
 
 # Utils
 tqdm==4.66.4
+
 
 
 
