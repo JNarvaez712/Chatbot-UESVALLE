@@ -22,7 +22,7 @@ sentence-transformers==2.6.1     # ← subido para cumplir con el plugin
 nltk==3.8.1
 
 # (opcional pero recomendado para evitar builds desde fuente)
-torch==2.1.2                      # ruedas CPU manylinux para Py3.11
+torch==2.5.1                      # ruedas CPU manylinux para Py3.11
 # torchvision es opcional; si no usas visión, no lo instales
 
 # Utils
