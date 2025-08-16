@@ -9,14 +9,14 @@ from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from chatbot.bot import responder_pregunta, _get_index, _get_engine, _get_retriever
+from chatbot.bot import responder_pregunta   # ⬅️ quitamos _get_index/_get_engine/_get_retriever
 from chatbot.indexer import crear_o_cargar_indice
 
 app = FastAPI(title="Chatbot UESVALLE")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # restringe luego al dominio oficial
+    allow_origins=["*"],   # restringe al dominio en prod si quieres
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -42,9 +42,9 @@ async def preguntar(q: str):
         if not q or not q.strip():
             return {"respuesta": "Por favor, escribe tu pregunta."}
         respuesta = responder_pregunta(q)
-        if not respuesta or len(respuesta.strip()) < 20:
-            respuesta = ("Lo siento, no tengo información suficiente para responder con certeza. "
-                         "Intenta formular la pregunta con más detalle o revisa la sección de Atención al Ciudadano.")
+        if not respuesta or len(respuesta.strip()) < 12:
+            respuesta = ("No tengo evidencia suficiente para responder con certeza. "
+                         "Intenta con más contexto o revisa Atención al Ciudadano.")
         logger.info("Q: %s | ok", q[:160])
         return {"respuesta": respuesta}
     except Exception:
@@ -56,26 +56,23 @@ async def preguntar(q: str):
 
 @app.on_event("startup")
 async def startup():
-    logger.info("Inicializando índice (con mapeo automático de rutas)…")
-    crear_o_cargar_indice()   # <- esto dispara build_url_manifest internamente
-    # precalentar
-    _get_index(); _get_retriever(); _get_engine()
-    logger.info("Índice y motor listos.")
+    # Warm-up: asegura que exista índice (hará el mapeo y catálogo antes de indexar)
+    logger.info("Inicializando índice (mapeo automático de rutas + catálogo)…")
+    crear_o_cargar_indice()
+    logger.info("Índice listo.")
 
+    # Reindexación automática cada 24h
     async def tarea_reindexacion():
         while True:
             try:
                 logger.info("🔁 Reindexación automática iniciada (map + index)…")
-                crear_o_cargar_indice()  # <- vuelve a mapear TODAS las rutas y reindexa
-                # limpiar caches para tomar el nuevo índice
-                _get_index.cache_clear()
-                _get_retriever.cache_clear()
-                _get_engine.cache_clear()
-                _get_index(); _get_retriever(); _get_engine()
+                crear_o_cargar_indice()
                 logger.info("✅ Reindexación completada.")
             except Exception:
                 logger.exception("⚠️ Error durante la reindexación automática")
-            await asyncio.sleep(60 * 60 * 24)  # cada 24h
+            await asyncio.sleep(60 * 60 * 24)
+
+    asyncio.create_task(tarea_reindexacion())
 
 if __name__ == "__main__":
     uvicorn.run("webchat.main:app", host="127.0.0.1", port=8000, reload=True)
