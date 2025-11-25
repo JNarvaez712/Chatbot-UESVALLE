@@ -20,9 +20,10 @@ llama-index-embeddings-huggingface==0.2.3
 # NLP
 sentence-transformers==2.6.1     # ← subido para cumplir con el plugin
 nltk==3.8.1
+numpy==2.3.2                      # fijado para evitar intento de downgrade a 1.26 en Py3.13
 
 # (opcional pero recomendado para evitar builds desde fuente)
-torch==2.5.1                      # ruedas CPU manylinux para Py3.11
+torch==2.6.0                      # actualizado para compatibilidad con Python 3.13 (2.5.1 no disponible)
 # torchvision es opcional; si no usas visión, no lo instales
 
 # Lexical ranking adicional (BM25) - opcional para mejorar fallback sin embeddings
