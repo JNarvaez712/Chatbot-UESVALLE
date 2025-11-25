@@ -16,7 +16,7 @@ WORKDIR /app
 # Copia requirements e instala
 COPY requirements.txt /app/requirements.txt
 RUN pip install --upgrade pip && \
-    pip install -r /app/requirements.txt
+    pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r /app/requirements.txt
 
 # ⚠️ PREINSTALAR NLTK DATA en ruta propia y exponerla por NLTK_DATA
 RUN mkdir -p /app/nltk_data
@@ -32,7 +32,11 @@ RUN useradd -ms /bin/bash appuser && chown -R appuser:appuser /app
 USER appuser
 
 # Puerto por defecto en Spaces
-ENV PORT=7860
+ENV PORT=7860 \
+    AUTO_BUILD_INDEX=0 \
+    EXACT_MODE=1 \
+    ANSWER_MODE=extractive \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
 # Comando de arranque (usa PORT si está definido)
 CMD ["sh", "-c", "uvicorn webchat.main:app --host 0.0.0.0 --port ${PORT:-7860}"]
