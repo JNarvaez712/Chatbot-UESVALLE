@@ -1,5 +1,5 @@
 # --- Base ligera con Python 3.10 (CPU) ---
-FROM python:3.10-slim AS base
+FROM python:3.13-slim AS base
 
 # Evita bytecode y buffering
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -21,8 +21,8 @@ RUN pip install --upgrade pip && \
 # ⚠️ PREINSTALAR NLTK DATA en ruta propia y exponerla por NLTK_DATA
 RUN mkdir -p /app/nltk_data
 ENV NLTK_DATA=/app/nltk_data
-# Pre-descarga de tokenizers que usa LlamaIndex
-RUN python -m nltk.downloader -d /app/nltk_data punkt punkt_tab stopwords
+# Pre-descarga de tokenizers que usa LlamaIndex (omitimos punkt_tab para evitar fallo si no existe)
+RUN python -m nltk.downloader -d /app/nltk_data punkt stopwords || true
 
 # Copia el código del proyecto
 COPY . /app
