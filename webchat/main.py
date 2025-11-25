@@ -1,6 +1,7 @@
 # webchat/main.py
 import asyncio
 import logging
+import os
 
 import uvicorn
 from fastapi import FastAPI, Request
