@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chatbot UESVALLE</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="/static/widget.css" />
+</head>
+<body>
+  <div id="chatWindow" role="dialog" aria-label="Chatbot UESVALLE" aria-modal="false">
+    <div id="chatHeader">
+      <div id="brand">
+        <img id="chatLogo" src="/static/img/uesly.png" alt="UESLY" />
+        <span>Chatbot UESVALLE</span>
+      </div>
+      <button type="button" onclick="toggleChat()" aria-label="Cerrar chat">✖</button>
+    </div>
+    <div id="chatBox" role="log" aria-live="polite" aria-relevant="additions text"></div>
+    <div id="inputContainer">
+      <textarea id="userInput" rows="2" placeholder="Escribe tu pregunta..." aria-label="Escribe tu pregunta"></textarea>
+      <button id="enviarBtn" type="button" onclick="sendMessage()" aria-label="Enviar mensaje">Enviar</button>
+    </div>
+  </div>
+
+  <button id="chatLauncher" type="button" onclick="toggleChat()" aria-label="Abrir chat">
+    <img src="/static/img/uesly.png" alt="" aria-hidden="true" />
+  </button>
+
+  <script src="/static/widget.js" defer></script>
+</body>
+</html>
+

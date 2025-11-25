@@ -1,0 +1,19 @@
+# índices y snapshots generados
+data/storage/
+data/web_snapshot/
+data/tmp_docs/
+data/url_manifest.json
+data/doc_catalog.json
+data/sections_catalog.json
+data/hf_cache/
+
+# entorno local (no subir a HF Spaces)
+venv/
+
+# Python artefactos compilados (evitar rechazo en HF)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Nota: data/storage y data/hf_cache se eliminan del índice antes del push a HF

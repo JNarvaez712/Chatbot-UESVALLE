@@ -1,0 +1,208 @@
+:root {
+  --brand: #0056a3;
+  --bg: #ffffff;
+  --msg-user: #d0e6ff;
+  --msg-bot: #e6f3e6;
+  --border: #d9d9d9;
+}
+
+#chatWindow {
+  width: 360px;
+  max-width: 100%;
+  /* Altura fluida: mínimo 420px, preferible 70vh, máximo 640px */
+  height: clamp(420px, 70vh, 640px);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: none;
+  flex-direction: column;
+  position: fixed;
+  bottom: 90px;
+  right: 24px;
+  box-shadow: 0 8px 28px rgba(0,0,0,.18);
+  z-index: 9999;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+#chatHeader {
+  background: var(--brand);
+  color: #fff;
+  padding: 12px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 52px;
+}
+
+#brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#chatHeader #chatLogo {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50%;
+  background: #fff;
+  object-fit: cover;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.45);
+  display: inline-block;
+  flex: 0 0 32px;
+}
+
+#chatBox {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  overflow-y: auto;
+  background-color: #f9fafb;
+  flex: 1;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.row.bot {
+  align-self: flex-start;
+}
+
+.mensaje {
+  display: inline-block;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  max-width: 90%;
+  line-height: 1.45;
+  /* ✅ Mantiene TODO el contenido dentro de la burbuja */
+  overflow-wrap: anywhere;        /* corta palabras/urls largas */
+  word-break: break-word;
+  white-space: pre-wrap;          /* respeta saltos de línea */
+  box-shadow: 0 1px 0 rgba(0,0,0,.04);
+}
+
+.user {
+  background-color: var(--msg-user);
+  align-self: flex-end;
+  text-align: right;
+}
+
+.bot {
+  background-color: var(--msg-bot);
+  align-self: flex-start;
+  text-align: left;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 1px 0 rgba(0,0,0,.06);
+  background: #fff;
+  flex: 0 0 32px;
+}
+
+.mensaje a {
+  text-decoration: underline;
+}
+
+#inputContainer {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  padding: 10px;
+  border-top: 1px solid var(--border);
+  background: #fff;
+  /* Evitar superposición con notches/barras en móviles */
+  padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+}
+
+#userInput {
+  flex: 1;
+  padding: 10px 12px;
+  resize: none;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  outline: none;
+}
+
+#userInput:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(0,86,163,.15);
+}
+
+#enviarBtn {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--brand);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Accesibilidad: enfoque visible */
+button:focus-visible, #userInput:focus-visible {
+  outline: 3px solid rgba(0,86,163,.4);
+  outline-offset: 2px;
+}
+
+/* Botón flotante */
+#chatLauncher {
+  position: fixed;
+  bottom: 20px;
+  right: 24px;
+  z-index: 9999;
+  background: #ffffff; /* botón siempre blanco */
+  color: var(--brand);
+  border: 2px solid var(--brand);
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0,0,0,.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  overflow: hidden; /* recorta imagen sobrante */
+}
+
+#chatLauncher img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* mantiene proporciones de la mascota */
+  display: block;
+  padding: 6px; /* margen interior para que no toque el borde */
+}
+
+/* ✅ Responsive (móvil): pantalla completa horizontal */
+@media (max-width: 520px) {
+  #chatWindow {
+    width: 100vw;
+    /* usar casi todo el alto, respetando safe area */
+    height: calc(100vh - 24px - env(safe-area-inset-bottom, 0px));
+    right: 0;
+    left: 0;
+    bottom: 0;
+    border-radius: 12px 12px 0 0;
+  }
+  #chatLauncher {
+    right: 16px;
+    bottom: 16px;
+  }
+}
+
+/* Eliminado modo oscuro: mantener esquema claro consistente */
+
+
+
