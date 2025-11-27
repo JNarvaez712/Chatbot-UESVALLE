@@ -1587,6 +1587,7 @@ def responder_pregunta(pregunta: str) -> str:
     wants_vision_only = ("vision" in norm_q or "visión" in norm_q) and not ("mision" in norm_q or "misión" in norm_q)
     wants_both_mv = (("mision" in norm_q or "misión" in norm_q) and ("vision" in norm_q or "visión" in norm_q)) or any(p in norm_q for p in ["mision vision","misión visión","mision y vision","misión y visión"])
     if wants_mision_only or wants_vision_only or wants_both_mv:
+        url_mv = "https://www.uesvalle.gov.co/publicaciones/2/mision-y-vision/"
         snap = _load_snapshot_mision_vision() or {}
         if not snap:
             # Intentar fetch rápido (timeout reducido)
@@ -1603,8 +1604,12 @@ def responder_pregunta(pregunta: str) -> str:
         out_lines = []
         if (wants_mision_only or wants_both_mv) and mission_par:
             out_lines.append(f"La misión de la UESVALLE es: {mission_par.strip()}")
+            out_lines.append(f"Aquí tienes el enlace oficial: {url_mv}")
         if (wants_vision_only or wants_both_mv) and vision_par:
             out_lines.append(f"La visión de la UESVALLE es: {vision_par.strip()}")
+            # Evitar duplicar el enlace si ya se añadió para la misión
+            if not ((wants_mision_only or wants_both_mv) and mission_par):
+                out_lines.append(f"Aquí tienes el enlace oficial: {url_mv}")
         if out_lines:
             ans_mv = "\n".join(out_lines)
             _push_history(pregunta, ans_mv)
