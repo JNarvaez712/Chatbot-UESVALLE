@@ -1617,7 +1617,11 @@ def responder_pregunta(pregunta: str) -> str:
             return ans_mv
 
     # Respuesta directa para funciones (antes de clasificación y retrieval)
-    if any(t in norm_q for t in ["funcion","función","funciones","funciónes"]):
+    if any(t in norm_q for t in [
+        "funcion","función","funciones","funciónes",
+        "que hace la uesvalle","qué hace la uesvalle",
+        "que hace la entidad","qué hace la entidad",
+    ]):
         funciones_live = _fetch_live_funciones(timeout=2.5)
         if not funciones_live:
             funciones_live = _direct_funciones()
