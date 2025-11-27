@@ -1577,7 +1577,9 @@ def responder_pregunta(pregunta: str) -> str:
 
     # Early link mapping (independiente de clasificación de intención). Evitar si es misión/visión o funciones (para poder extraer texto).
     norm_q_for_link = _norm(pregunta)
-    if not any(x in norm_q_for_link for x in ["mision","misión","vision","visión","funcion","función","funciones"]):
+    if not any(x in norm_q_for_link for x in ["mision","misión","vision","visión","funcion","función","funciones", 
+                                              "que hace la uesvalle","qué hace la uesvalle",
+                                              "que hace la entidad","qué hace la entidad"]):
         # Incluir mapping dinámico además del manual para early link
         for k, u in {**DYNAMIC_LINK_MAP, **KEYWORD_LINK_MAP}.items():
             if k in norm_q_for_link:
