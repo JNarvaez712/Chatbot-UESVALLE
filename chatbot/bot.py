@@ -112,6 +112,11 @@ KEYWORD_LINK_MAP = {
     "pqr": "https://www.uesvalle.gov.co/publicaciones/1141/formulario-de-peticiones-quejas-reclamos-sugerencias-denuncias-y-solicitud-de-informacion-publica/",
     "pqrsd": "https://www.uesvalle.gov.co/publicaciones/1141/formulario-de-peticiones-quejas-reclamos-sugerencias-denuncias-y-solicitud-de-informacion-publica/",
     "formulario pqr": "https://www.uesvalle.gov.co/publicaciones/1141/formulario-de-peticiones-quejas-reclamos-sugerencias-denuncias-y-solicitud-de-informacion-publica/",
+    "transparencia": "https://www.uesvalle.gov.co/publicaciones/1558/transparencia-y-acceso-a-la-informacion-publica/",
+    "transparencia y acceso": "https://www.uesvalle.gov.co/publicaciones/1558/transparencia-y-acceso-a-la-informacion-publica/",
+    "acceso a la informacion publica": "https://www.uesvalle.gov.co/publicaciones/1558/transparencia-y-acceso-a-la-informacion-publica/",
+    "acceso a la información publica": "https://www.uesvalle.gov.co/publicaciones/1558/transparencia-y-acceso-a-la-informacion-publica/",
+    "acceso a la información pública": "https://www.uesvalle.gov.co/publicaciones/1558/transparencia-y-acceso-a-la-informacion-publica/",
     # Mision Vision
     "mision vision": "https://www.uesvalle.gov.co/publicaciones/2/mision-y-vision/",
     "mision": "https://www.uesvalle.gov.co/publicaciones/2/mision-y-vision/",
