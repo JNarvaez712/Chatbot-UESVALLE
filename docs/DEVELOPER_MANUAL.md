@@ -394,11 +394,61 @@ Checklist post incidente: documentar causa raíz, acción correctiva y prevenci�
 - Rotación: cada 90 días o tras eventos de seguridad.  
 
 ## 32. Guía de Integración del Widget
-Para incrustar el widget (`/widget`) en otro sitio institucional:  
+Para incrustar el widget en otro sitio institucional existen dos modalidades principales:
+
+1. **Integración directa por iframe del backend** (cuando se expone el endpoint `/widget` desde un dominio propio).  
+2. **Integración por iframe a un despliegue en Hugging Face Spaces** (caso portal UESVALLE actual).
+
+### 32.1 Integración clásica vía `/widget`
+Cuando el chatbot se expone desde un dominio propio, el widget puede incrustarse con:
+
 1. Incluir `<iframe src="https://<dominio>/widget" ...>` con altura dinámica.  
 2. Configurar CORS si se necesitaran llamadas directas a `/preguntar` desde JS externo (restringir dominio).  
 3. Añadir mensaje de accesibilidad (ver sección accesibilidad).  
 4. Si se requiere personalización visual, extender `webchat/static/widget.css` manteniendo clases base.  
+
+### 32.2 Integración UESVALLE por iframe (Hugging Face Space)
+En el portal institucional de la UESVALLE el chatbot se integra actualmente consumiendo directamente el Space de Hugging Face, posicionando el iframe como widget flotante fijo en la esquina inferior izquierda. Esto es útil cuando el CMS no permite modificar el CSS global.
+
+Snippet utilizado en producción:
+
+```html
+<style>
+	#uesvalle-chatbot-widget {
+		position: fixed !important;
+		bottom: 20px !important;
+		left: 20px !important;
+		z-index: 999999 !important;
+		width: 350px !important;
+		height: 500px !important;
+		border-radius: 10px !important;
+		overflow: hidden !important;
+		box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important;
+		background: transparent !important;
+	}
+
+	#uesvalle-chatbot-widget iframe {
+		width: 100% !important;
+		height: 100% !important;
+		border: none !important;
+		display: block !important;
+	}
+</style>
+
+<div id="uesvalle-chatbot-widget">
+	<iframe
+		src="https://jnarvaez712-uesvalle-chatbot.hf.space"
+		frameborder="0"
+		title="Chatbot UESVALLE"
+		loading="lazy"
+	></iframe>
+</div>
+```
+
+Notas:
+- Este bloque debe insertarse lo más cercano posible al cierre de `</body>` del portal que lo consume.
+- El uso de `position: fixed` y `z-index` alto garantiza que el widget permanezca visible al hacer scroll y quede por encima del contenido principal.
+- `background: transparent` y la ausencia de estilos en contenedores padres evitan paneles blancos o fondos traslúcidos no deseados generados por el CMS.
 
 ## 33. Accesibilidad (A11y)
 - WCAG 2.1 AA objetivos: contraste, navegación por teclado, etiquetas ARIA en el widget (revisar `widget.html`).  
