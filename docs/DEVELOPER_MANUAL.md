@@ -1,7 +1,7 @@
 # Manual del Desarrollador – Chatbot UESVALLE
 
-> Versión: 1.0.1  
-> Última actualización: 2025-11-29  
+> Versión: 1.0.2  
+> Última actualización: 2025-12-01  
 > Responsable inicial: Equipo de desarrollo UESVALLE Bot
 
 ## 1. Resumen Ejecutivo
@@ -419,8 +419,8 @@ Snippet utilizado en producción:
 		bottom: 20px !important;
 		left: 20px !important;
 		z-index: 999999 !important;
-		width: 350px !important;
-		height: 500px !important;
+		width: 850px !important;
+		height: 520px !important;
 		border-radius: 10px !important;
 		overflow: hidden !important;
 		box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important;
