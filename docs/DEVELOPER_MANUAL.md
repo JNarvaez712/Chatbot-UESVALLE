@@ -1,7 +1,7 @@
 # Manual del Desarrollador – Chatbot UESVALLE
 
-> Versión: 1.0.2  
-> Última actualización: 2025-12-01  
+> Versión: 1.0.3  
+> Última actualización: 2025-12-02  
 > Responsable inicial: Equipo de desarrollo UESVALLE Bot
 
 ## 1. Resumen Ejecutivo
@@ -449,6 +449,19 @@ Notas:
 - Este bloque debe insertarse lo más cercano posible al cierre de `</body>` del portal que lo consume.
 - El uso de `position: fixed` y `z-index` alto garantiza que el widget permanezca visible al hacer scroll y quede por encima del contenido principal.
 - `background: transparent` y la ausencia de estilos en contenedores padres evitan paneles blancos o fondos traslúcidos no deseados generados por el CMS.
+
+### 32.3 Comportamiento actual del widget en Hugging Face
+
+El frontend propio del chatbot se sirve mediante la plantilla `webchat/templates/widget.html` y la hoja de estilos `webchat/static/widget.css`. A partir de la versión 1.0.3 se aplican los siguientes cambios relevantes para integraciones por iframe:
+
+- La ventana del chat (`#chatWindow`) se muestra **siempre visible** (no hay botón lanzador flotante dentro del iframe).
+- Se eliminó el botón de cierre "✖" en el encabezado del widget; el cierre/apertura del iframe se controla únicamente desde la página que lo incrusta (por ejemplo, con un botón externo tipo Uesly).
+- El script `webchat/static/widget.js` agrega automáticamente, al cargarse la página, el mensaje de bienvenida del bot:
+
+	> "Hola, soy Uesly. ¿En qué puedo ayudarte hoy?"
+
+	Esto se hace una sola vez por carga usando un flag `chatBox.dataset.greeted` para evitar duplicados.
+- La ruta raíz `/` del servicio FastAPI redirige a `/widget`, por lo que en Hugging Face Spaces la pestaña **App** muestra directamente la ventana completa del chatbot.
 
 ## 33. Accesibilidad (A11y)
 - WCAG 2.1 AA objetivos: contraste, navegación por teclado, etiquetas ARIA en el widget (revisar `widget.html`).  
