@@ -125,5 +125,12 @@ window.addEventListener("load", () => {
       sendMessage();
     }
   });
+
+  // Saludo inicial automático cuando se carga el widget
+  const chatBox = document.getElementById("chatBox");
+  if (chatBox && !chatBox.dataset.greeted) {
+    addMessage("bot", "Hola, soy Uesly. ¿En qué puedo ayudarte hoy?");
+    chatBox.dataset.greeted = "1";
+  }
 });
 
