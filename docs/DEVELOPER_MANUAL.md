@@ -1,6 +1,6 @@
 # Manual del Desarrollador – Chatbot UESVALLE
 
-> Versión: 1.0.3  
+> Versión: 1.0.4  
 > Última actualización: 2025-12-02  
 > Responsable inicial: Equipo de desarrollo UESVALLE Bot
 
@@ -408,47 +408,132 @@ Cuando el chatbot se expone desde un dominio propio, el widget puede incrustarse
 4. Si se requiere personalización visual, extender `webchat/static/widget.css` manteniendo clases base.  
 
 ### 32.2 Integración UESVALLE por iframe (Hugging Face Space)
-En el portal institucional de la UESVALLE el chatbot se integra actualmente consumiendo directamente el Space de Hugging Face, posicionando el iframe como widget flotante fijo en la esquina inferior izquierda. Esto es útil cuando el CMS no permite modificar el CSS global.
+En el portal institucional de la UESVALLE el chatbot se integra actualmente consumiendo directamente el Space de Hugging Face, pero **envolviéndolo en un botón flotante con Uesly y una ventana propia**. De esta forma, el iframe sólo se muestra cuando el usuario abre el chat y no hay contenedores blancos adicionales bloqueando clics.
 
 Snippet utilizado en producción:
 
 ```html
 <style>
-	#uesvalle-chatbot-widget {
-		position: fixed !important;
-		bottom: 20px !important;
-		left: 20px !important;
-		z-index: 999999 !important;
-		width: 850px !important;
-		height: 520px !important;
-		border-radius: 10px !important;
-		overflow: hidden !important;
-		box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important;
-		background: transparent !important;
-	}
+    /* 1. Estilos del Botón Flotante */
+    #uesvalle-chat-btn {
+        position: fixed;
+        bottom: 20px;
+        left: 20px; /* Se mantiene a la izquierda como solicitaste */
+        z-index: 1000000;
+        width: 65px;
+        height: 65px;
+        border-radius: 50%;
+        
+        /* COLOR INSTITUCIONAL UESVALLE */
+        background-color: #0054A6; /* Azul Institucional */
+        /* Si prefieres el verde de saneamiento usa: #2E7D32 */
+        
+        color: white;
+        border: 2px solid white; /* Borde blanco para resaltar */
+        font-size: 32px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        overflow: hidden; /* Para que la imagen quede recortada en círculo */
+    }
 
-	#uesvalle-chatbot-widget iframe {
-		width: 100% !important;
-		height: 100% !important;
-		border: none !important;
-		display: block !important;
-	}
+    #uesvalle-chat-btn:hover {
+        transform: scale(1.1);
+        background-color: #004080; /* Azul más oscuro al pasar el mouse */
+    }
+
+    /* Imagen dentro del botón */
+    #uesvalle-chat-btn img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    /* 2. Estilos del Contenedor del Chat (La ventana) */
+    #uesvalle-chat-container {
+        display: none; /* INICIALMENTE OCULTO */
+        position: fixed;
+        bottom: 100px; /* Encima del botón */
+        left: 20px;
+        width: 400px; /* Ancho estándar */
+        height: 550px;
+        
+        /* Ajustes para celulares */
+        max-width: 90vw; 
+        max-height: 75vh;
+        
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        z-index: 999999;
+        overflow: hidden;
+        border: 1px solid #e0e0e0;
+        
+        /* Animación de entrada */
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    /* Animación suave al abrir */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 3. Estilos del Iframe */
+    #uesvalle-chat-container iframe {
+        position: absolute;
+        top: -20px !important;             /* <--- LINEA CLAVE 1 */
+        left: 0 !important;
+        width: 100% !important;
+        height: calc(100% + 20px) !important; /* <--- LINEA CLAVE 2 */
+        border: none !important;
+        display: block !important;
+        background: white !important;
+    }
 </style>
 
-<div id="uesvalle-chatbot-widget">
-	<iframe
-		src="https://jnarvaez712-uesvalle-chatbot.hf.space"
-		frameborder="0"
-		title="Chatbot UESVALLE"
-		loading="lazy"
-	></iframe>
+<button id="uesvalle-chat-btn" onclick="toggleUesvalleChat()" title="Hablar con Chatbot UESVALLE">
+    <img
+        src="https://www.uesvalle.gov.co/publicaciones/1106/informacion-para-ninos-y-ninas/info/uesvalle/media/galeria232.png"
+        alt="Uesly - Chatbot UESVALLE"
+    />
+</button>
+
+<div id="uesvalle-chat-container">
+    <iframe
+        src="https://jnarvaez712-uesvalle-chatbot.hf.space"
+        title="Chatbot UESVALLE"
+        loading="lazy"
+    ></iframe>
 </div>
+
+<script>
+    function toggleUesvalleChat() {
+        var chatContainer = document.getElementById("uesvalle-chat-container");
+        var btn = document.getElementById("uesvalle-chat-btn");
+
+        if (chatContainer.style.display === "none" || chatContainer.style.display === "") {
+            // ABRIR
+            chatContainer.style.display = "block";
+            btn.title = "Cerrar chat";
+        } else {
+            // CERRAR
+            chatContainer.style.display = "none";
+            btn.title = "Hablar con Chatbot UESVALLE";
+        }
+    }
+</script>
 ```
 
 Notas:
-- Este bloque debe insertarse lo más cercano posible al cierre de `</body>` del portal que lo consume.
-- El uso de `position: fixed` y `z-index` alto garantiza que el widget permanezca visible al hacer scroll y quede por encima del contenido principal.
-- `background: transparent` y la ausencia de estilos en contenedores padres evitan paneles blancos o fondos traslúcidos no deseados generados por el CMS.
+- Este bloque debe insertarse lo más cercano posible al cierre de `</body>`.
+- El botón flotante circular con la imagen de Uesly abre/cierra la ventana sin modificar el DOM interno del iframe.
+- Las líneas `top: -20px` y `height: calc(100% + 20px)` en el iframe desplazan el contenido para ocultar el pequeño margen superior del Space y que sólo se vea la ventana del chatbot.
 
 ### 32.3 Comportamiento actual del widget en Hugging Face
 
@@ -593,3 +678,121 @@ Si Hugging Face rechaza el push por binarios rastreados históricamente:
 Script disponible: `tools/verify_clean_push.py` (ver comentarios internos para ampliar reglas).
 
 
+```html
+<style>
+    /* 1. Estilos del Botón Flotante */
+    #uesvalle-chat-btn {
+        position: fixed;
+        bottom: 20px;
+        left: 20px; /* Se mantiene a la izquierda como solicitaste */
+        z-index: 1000000;
+        width: 65px;
+        height: 65px;
+        border-radius: 50%;
+        
+        /* COLOR INSTITUCIONAL UESVALLE */
+        background-color: #0054A6; /* Azul Institucional */
+        /* Si prefieres el verde de saneamiento usa: #2E7D32 */
+        
+        color: white;
+        border: 2px solid white; /* Borde blanco para resaltar */
+        font-size: 32px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        overflow: hidden; /* Para que la imagen quede recortada en círculo */
+    }
+
+    #uesvalle-chat-btn:hover {
+        transform: scale(1.1);
+        background-color: #004080; /* Azul más oscuro al pasar el mouse */
+    }
+
+    /* Imagen dentro del botón */
+    #uesvalle-chat-btn img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    /* 2. Estilos del Contenedor del Chat (La ventana) */
+    #uesvalle-chat-container {
+        display: none; /* INICIALMENTE OCULTO */
+        position: fixed;
+        bottom: 100px; /* Encima del botón */
+        left: 20px;
+        width: 400px; /* Ancho estándar */
+        height: 550px;
+        
+        /* Ajustes para celulares */
+        max-width: 90vw; 
+        max-height: 75vh;
+        
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        z-index: 999999;
+        overflow: hidden;
+        border: 1px solid #e0e0e0;
+        
+        /* Animación de entrada */
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    /* Animación suave al abrir */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 3. Estilos del Iframe */
+    #uesvalle-chat-container iframe {
+       position: absolute;
+    top: -20px !important;             /* <--- LINEA CLAVE 1 */
+    left: 0 !important;
+    width: 100% !important;
+    height: calc(100% + 20px) !important; /* <--- LINEA CLAVE 2 */
+    border: none !important;
+    display: block !important;
+    background: white !important;
+
+    }
+</style>
+
+<button id="uesvalle-chat-btn" onclick="toggleUesvalleChat()" title="Hablar con Chatbot UESVALLE">
+    <img
+        src="https://www.uesvalle.gov.co/publicaciones/1106/informacion-para-ninos-y-ninas/info/uesvalle/media/galeria232.png"
+        alt="Uesly - Chatbot UESVALLE"
+    />
+</button>
+
+<div id="uesvalle-chat-container">
+    <iframe
+        src="https://jnarvaez712-uesvalle-chatbot.hf.space"
+        title="Chatbot UESVALLE"
+        loading="lazy"
+    ></iframe>
+</div>
+
+<script>
+    function toggleUesvalleChat() {
+        var chatContainer = document.getElementById("uesvalle-chat-container");
+        var btn = document.getElementById("uesvalle-chat-btn");
+
+        if (chatContainer.style.display === "none" || chatContainer.style.display === "") {
+            // ABRIR
+            chatContainer.style.display = "block";
+            btn.title = "Cerrar chat";
+        } else {
+            // CERRAR
+            chatContainer.style.display = "none";
+            btn.title = "Hablar con Chatbot UESVALLE";
+        }
+    }
+</script>
+````
