@@ -44,7 +44,7 @@ function linkifyText(text) {
 function createBotRow(text) {
   const row = el("div", "row bot");
   const avatar = el("img", "avatar");
-  avatar.src = "/static/img/uesly.png";
+  avatar.src = "/static/img/Icono_chatbot.webp";
   avatar.alt = "UESLY";
   const msg = el("div", "mensaje bot");
   msg.appendChild(linkifyText(String(text || "").trim()));
