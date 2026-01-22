@@ -1533,7 +1533,7 @@ def _is_small_talk(q: str) -> str | None:
     """Devuelve una respuesta corta si es small talk; si no, None."""
     if SMALL_TALK_PATTERNS["saludo"].search(q):
         return (
-            "¡Hola! Soy Uesly, tu asistente virtual de la UESVALLE. Puedo guiarte por el sitio, "
+            "¡Hola! Soy tu Asistente Virtual de la UESVALLE. Puedo guiarte por el sitio, "
             "dar enlaces a secciones y resumir contenidos. ¿En qué te ayudo?"
         )
     if SMALL_TALK_PATTERNS["despedida"].search(q):
